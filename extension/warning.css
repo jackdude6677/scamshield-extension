@@ -1,17 +1,24 @@
-body { background: #5c0010; color: #ffffff; min-height: 100vh; }
-.wrap { max-width: 800px; margin: 0 auto; padding: 32px 24px 64px; }
-.brand { display: flex; align-items: center; gap: 10px; font-size: .85em; letter-spacing: .05em; text-transform: uppercase; margin: 0 0 18px; }
-h1 { font-size: 2em; } h1:focus { outline: none; }
+/* Alarm HUD: same layout language as the rest of ScamShield, in red. Text stays white on near-black. */
+:root { --cyan: #ff6b7d; --line: #b3314a; --on-cyan: #1a0004; --focus: #ffe066; }
+body {
+  min-height: 100vh; color: #fff;
+  background:
+    radial-gradient(900px 480px at 50% -140px, rgba(255,60,90,.40), transparent 70%),
+    repeating-linear-gradient(135deg, rgba(255,107,125,.05) 0 14px, transparent 14px 28px), #1b0208;
+}
+.wrap { max-width: 820px; margin: 0 auto; padding: 28px 22px 64px; }
+.brand { display: flex; align-items: center; gap: 12px; font: .62em ui-monospace, Menlo, Consolas, monospace; letter-spacing: .16em; text-transform: uppercase; margin: 0 0 18px; color: #ffb3bd; }
+.brand img { width: 56px; height: 56px; filter: hue-rotate(165deg) drop-shadow(0 0 10px rgba(255,80,100,.8)); }
+h1 { font-size: 2.1em; text-shadow: 0 0 18px rgba(255,80,100,.6); } h1:focus { outline: none; }
 .summary { font-size: 1.1em; }
-.site { word-break: break-all; }
+.site { word-break: break-all; border: 1px solid var(--line); border-left: 8px solid var(--cyan); padding: 10px 14px; background: rgba(255,107,125,.12); }
 .actions { display: flex; flex-direction: column; gap: 14px; margin: 28px 0 12px; }
-.actions button { border-color: #fff; }
-.primary { background: #fff; color: #5c0010; font-size: 1.3em; min-height: 64px; }
-.secondary { background: transparent; color: #fff; border-color: #fff; }
-.quiet { background: transparent; color: #fff; border-color: transparent; text-decoration: underline; font-weight: 500; }
+button.primary { background: #fff; color: #3a0010; border-color: #fff; font-size: 1.3em; min-height: 68px; box-shadow: 0 0 26px rgba(255,255,255,.35); }
+.primary:hover { box-shadow: 0 0 34px rgba(255,255,255,.6); }
+button.secondary { background: transparent; color: #fff; border-color: #fff; box-shadow: none; }
+button.quiet { background: transparent; color: #fff; border-color: transparent; text-decoration: underline; font-weight: 500; box-shadow: none; }
 .quiet.armed { border-color: #fff; text-decoration: none; font-weight: 700; }
-.why { background: rgba(0,0,0,.35); border-radius: 12px; padding: 8px 20px 16px; margin-top: 20px; }
-.why a { color: #ffe08a; } .fineprint { color: #f5d5da; }
-.break { word-break: break-all; }
+.why { position: relative; background: rgba(0,0,0,.45); border: 1px solid var(--line); padding: 8px 22px 16px; margin-top: 20px; }
+.why h2 { color: #ffb3bd; }
+.fineprint { color: #ffd0d6; } .break { word-break: break-all; }
 [hidden] { display: none !important; }
-button:focus-visible { outline-color: #ffd54a; }

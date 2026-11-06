@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-hidden="true">
+  <style>
+    .spin{transform-origin:60px 60px;animation:s 14s linear infinite}
+    .spin2{transform-origin:60px 60px;animation:s 22s linear infinite reverse}
+    .pulse{animation:p 3s ease-in-out infinite}
+    @keyframes s{to{transform:rotate(360deg)}}
+    @keyframes p{50%{opacity:.55}}
+    @media (prefers-reduced-motion:reduce){.spin,.spin2,.pulse{animation:none}}
+  </style>
+  <defs><radialGradient id="g"><stop offset="0" stop-color="#e8fbff"/><stop offset=".45" stop-color="#4fe3ff"/><stop offset="1" stop-color="#4fe3ff" stop-opacity="0"/></radialGradient></defs>
+  <circle cx="60" cy="60" r="58" fill="#04101c"/>
+  <circle class="spin" cx="60" cy="60" r="54" fill="none" stroke="#4fe3ff" stroke-width="2" stroke-dasharray="14 8 3 8"/>
+  <circle class="spin2" cx="60" cy="60" r="44" fill="none" stroke="#4fe3ff" stroke-width="3" stroke-dasharray="40 10" opacity=".8"/>
+  <circle cx="60" cy="60" r="34" fill="none" stroke="#4fe3ff" stroke-width="1.5" opacity=".6"/>
+  <g stroke="#4fe3ff" stroke-width="3" opacity=".9"><path d="M60 26v10M60 84v10M26 60h10M84 60h10"/></g>
+  <path d="M60 38l17 6v13c0 12-8 20-17 24-9-4-17-12-17-24V44z" fill="#062a40" stroke="#4fe3ff" stroke-width="2.5"/>
+  <path d="M51 58l7 7 13-14" fill="none" stroke="#e8fbff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle class="pulse" cx="60" cy="60" r="30" fill="url(#g)" opacity=".25"/>
+</svg>

@@ -37,8 +37,8 @@ function png(size) {
       const total = SS * SS;
       const o = y * (size * 4 + 1) + 1 + x * 4;
       const cov = a / total, chkCov = a ? chk / a : 0;
-      // shield #0b4f9c, check white
-      raw[o] = Math.round(11 + (255 - 11) * chkCov); raw[o + 1] = Math.round(79 + (255 - 79) * chkCov); raw[o + 2] = Math.round(156 + (255 - 156) * chkCov);
+      // shield cyan, check dark navy
+      raw[o] = Math.round(79 + (4 - 79) * chkCov); raw[o + 1] = Math.round(227 + (16 - 227) * chkCov); raw[o + 2] = Math.round(255 + (28 - 255) * chkCov);
       raw[o + 3] = Math.round(255 * cov);
     }
   }
