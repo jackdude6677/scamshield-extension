@@ -1,7 +1,7 @@
 /* ScamShield – service worker.
  * Privacy: no analytics, no logging, no history stored. The only network call is an
  * optional hash-prefix lookup to the proxy the user configured. */
-importScripts('src/domain.js', 'src/brands.js', 'src/urlcheck.js', 'src/threatdb.js', 'src/messagecheck.js', 'src/settings.js');
+importScripts('src/domain.js', 'src/brands.js', 'src/urlcheck.js', 'src/threatdb.js', 'src/messagecheck.js', 'src/settings.js', 'src/feed.js');
 
 const { analyzeUrl } = SS.urlcheck;
 const ALLOW_MINUTES = 30;
@@ -13,15 +13,26 @@ const threatClient = SS.threatdb.createClient({
   },
 });
 
+const feed = SS.feed.createFeed({
+  getUrl: async () => (await SS.settings.get()).feedUrl,
+  isEnabled: async () => (await SS.settings.get()).feedEnabled,
+  store: {
+    get: async () => (await chrome.storage.local.get('feed')).feed,
+    set: (v) => chrome.storage.local.set({ feed: v }),
+  },
+});
+
 /** Combine local rules and the threat database into one verdict. */
 async function checkUrl(url) {
   const local = analyzeUrl(url);
   let db = { status: 'disabled', threats: [] };
-  if (!local.invalid && !local.skipped && !local.local) db = await threatClient.lookup(url);
-  if (db.status === 'match') {
-    return { level: 'threat', source: 'database', reasons: SS.threatdb.reasonsFromThreats(db.threats).concat(local.reasons), db: db.status, hostname: local.hostname };
+  let fd = { status: 'disabled' };
+  if (!local.invalid && !local.skipped && !local.local) [db, fd] = await Promise.all([threatClient.lookup(url), feed.lookup(url)]);
+  if (db.status === 'match' || fd.status === 'match') {
+    const reasons = (db.status === 'match' ? SS.threatdb.reasonsFromThreats(db.threats) : []).concat(fd.status === 'match' ? SS.feed.reasons() : []);
+    return { level: 'threat', source: db.status === 'match' ? 'database' : 'feed', reasons: reasons.concat(local.reasons), db: db.status, feed: fd.status, hostname: local.hostname };
   }
-  return { level: local.level, source: 'rules', reasons: local.reasons, db: db.status, hostname: local.hostname, score: local.score };
+  return { level: local.level, source: 'rules', reasons: local.reasons, db: db.status, feed: fd.status, hostname: local.hostname, score: local.score };
 }
 
 // ---- "Continue anyway" memory: this browser session only, per site, 30 minutes ----
@@ -89,6 +100,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         let dbStatus = 'disabled';
         // Look links up by hash prefix only. Nothing is opened or fetched from the links themselves.
         for (const link of result.links) {
+          const fd = await feed.lookup(link.url);
+          if (fd.status === 'match') {
+            link.level = 'threat';
+            link.reasons = SS.feed.reasons().concat(link.reasons);
+            result.level = 'threat';
+            result.reasons = [Object.assign({}, link.reasons[0], { title: `Link "${link.shown.slice(0, 40)}": ${link.reasons[0].title}` })].concat(result.reasons);
+          }
           const db = await threatClient.lookup(link.url);
           dbStatus = db.status === 'match' ? 'match' : (dbStatus === 'match' ? 'match' : db.status);
           if (db.status === 'match') {
@@ -101,6 +119,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         result.dbStatus = dbStatus;
         return result;
       }
+      case 'FEED_STATUS': return feed.status();
+      case 'FEED_REFRESH': { const r = await feed.refresh(true); return Object.assign({}, r, await feed.status()); }
       case 'ALLOW_CONTINUE': {
         const host = new URL(String(msg.url)).hostname;
         await allowHost(host);
@@ -124,6 +144,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   return true; // async response
 });
 
+chrome.runtime.onStartup.addListener(() => { feed.refresh(false).catch(() => {}); });
 chrome.runtime.onInstalled.addListener((details) => {
+  feed.refresh(false).catch(() => {});
   if (details.reason === 'install') chrome.runtime.openOptionsPage();
 });

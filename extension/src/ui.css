@@ -1,33 +1,57 @@
-/* Shared look for ScamShield pages: large text, high contrast, visible focus. */
+/* ScamShield HUD theme: dark, cyan glow, large text, high contrast (all text >= 7:1). */
 :root {
-  --bg: #ffffff; --fg: #111827; --muted: #374151; --card: #f3f4f6; --border: #4b5563;
-  --accent: #0b4f9c; --accent-fg: #ffffff; --danger: #8c0014; --danger-fg: #ffffff;
-  --ok-bg: #e8f1fb; --warn-bg: #fff4d6; --bad-bg: #fde8ea; --focus: #ffbf00;
-  --fs: 20px;
+  --bg: #050b14; --fg: #e8f6ff; --muted: #b6cde0; --card: rgba(10, 30, 52, .82);
+  --line: #2a7fa0; --cyan: #4fe3ff; --on-cyan: #00131c; --amber: #ffc24d; --red: #ff6b7d;
+  --ok-bg: rgba(79, 227, 255, .10); --warn-bg: rgba(255, 194, 77, .12); --bad-bg: rgba(255, 107, 125, .14);
+  --focus: #ffe066; --fs: 20px;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
-@media (prefers-color-scheme: dark) {
-  :root { --bg: #0f172a; --fg: #f8fafc; --muted: #d1d5db; --card: #1e293b; --border: #94a3b8;
-    --accent: #8ec5ff; --accent-fg: #0b1220; --ok-bg: #12304f; --warn-bg: #4a3600; --bad-bg: #5a1020; }
-}
-@media (forced-colors: active) { :root { --border: CanvasText; } }
 html.size-normal { --fs: 18px; } html.size-large { --fs: 20px; } html.size-xlarge { --fs: 24px; }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--fg); font: var(--fs)/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
-h1 { font-size: 1.5em; line-height: 1.2; margin: 0 0 .4em; } h2 { font-size: 1.15em; margin: 1em 0 .4em; }
-p { margin: 0 0 .8em; } a { color: var(--accent); }
-button, .btn { font: inherit; font-weight: 700; min-height: 52px; padding: 10px 20px; border-radius: 10px; border: 3px solid var(--accent); background: var(--accent); color: var(--accent-fg); cursor: pointer; }
-button.secondary { background: transparent; color: var(--fg); border-color: var(--border); }
-button:disabled { opacity: .6; cursor: progress; }
-button:focus-visible, a:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
-textarea, input[type=text], input[type=url], select { font: inherit; width: 100%; padding: 10px 12px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--fg); }
+body {
+  margin: 0; color: var(--fg); font: var(--fs)/1.55 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background:
+    radial-gradient(900px 420px at 50% -120px, rgba(79,227,255,.18), transparent 70%),
+    linear-gradient(rgba(79,227,255,.05) 1px, transparent 1px) 0 0 / 36px 36px,
+    linear-gradient(90deg, rgba(79,227,255,.05) 1px, transparent 1px) 0 0 / 36px 36px,
+    var(--bg);
+  background-attachment: fixed;
+}
+h1 { font-size: 1.5em; line-height: 1.2; margin: 0 0 .4em; letter-spacing: .01em; }
+h2 { font-size: 1.1em; margin: 1.1em 0 .4em; color: var(--cyan); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+p { margin: 0 0 .8em; } a { color: var(--cyan); }
+.hud-top { display: flex; align-items: center; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+.hud-top img { width: 52px; height: 52px; filter: drop-shadow(0 0 8px rgba(79,227,255,.7)); }
+.hud-top h1 { margin: 0; text-shadow: 0 0 14px rgba(79,227,255,.55); }
+.tag { font-family: var(--mono); font-size: .55em; letter-spacing: .12em; color: var(--cyan); display: block; text-transform: uppercase; }
+button, .btn {
+  font: inherit; font-weight: 700; min-height: 52px; padding: 10px 22px; border-radius: 8px; cursor: pointer; text-decoration: none;
+  border: 2px solid var(--cyan); background: var(--cyan); color: var(--on-cyan);
+  box-shadow: 0 0 18px rgba(79,227,255,.35); transition: box-shadow .15s, transform .05s;
+}
+button:hover, .btn:hover { box-shadow: 0 0 26px rgba(79,227,255,.65); }
+button:active { transform: translateY(1px); }
+button.secondary { background: transparent; color: var(--cyan); box-shadow: none; }
+button.secondary:hover { background: rgba(79,227,255,.12); }
+button:disabled { opacity: .65; cursor: progress; }
+button:focus-visible, a:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, .btn:focus-visible { outline: 4px solid var(--focus); outline-offset: 3px; }
+textarea, input[type=text], input[type=url], select { font: inherit; width: 100%; padding: 10px 12px; border: 2px solid var(--line); border-radius: 8px; background: rgba(2,8,16,.85); color: var(--fg); }
+textarea::placeholder, input::placeholder { color: #8fb0c6; }
 label { font-weight: 600; display: block; margin-bottom: .3em; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.card { background: var(--card); border: 2px solid var(--border); border-radius: 12px; padding: 14px 16px; margin: 12px 0; }
-.status { border-left: 10px solid var(--border); }
-.status.none { background: var(--ok-bg); border-left-color: var(--accent); }
-.status.caution { background: var(--warn-bg); border-left-color: #b45309; }
-.status.warning, .status.threat { background: var(--bad-bg); border-left-color: var(--danger); }
-.status h2 { margin-top: 0; }
+.card { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 14px 18px; margin: 12px 0; }
+.card::before, .card::after { content: ""; position: absolute; width: 14px; height: 14px; border: 2px solid var(--cyan); pointer-events: none; }
+.card::before { top: -2px; left: -2px; border-right: 0; border-bottom: 0; }
+.card::after { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
+.status { border-left: 8px solid var(--cyan); background: var(--ok-bg); }
+.status.caution { border-left-color: var(--amber); background: var(--warn-bg); }
+.status.caution::before, .status.caution::after { border-color: var(--amber); }
+.status.warning, .status.threat { border-left-color: var(--red); background: var(--bad-bg); }
+.status.warning::before, .status.warning::after, .status.threat::before, .status.threat::after { border-color: var(--red); }
+.status h2 { margin-top: 0; color: var(--fg); text-transform: none; letter-spacing: 0; font-size: 1.2em; }
+.status.none h2::before { content: "◉ "; color: var(--cyan); } .status.caution h2::before { content: "▲ "; color: var(--amber); }
+.status.warning h2::before, .status.threat h2::before { content: "⬣ "; color: var(--red); }
 .fineprint { color: var(--muted); font-size: .85em; }
 ul.reasons { padding-left: 1.2em; margin: .4em 0; } ul.reasons li { margin-bottom: .6em; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+@media (forced-colors: active) { .card::before, .card::after { border-color: CanvasText; } button { border-color: ButtonText; } }

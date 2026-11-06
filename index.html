@@ -5,45 +5,76 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ScamShield: free scam protection for Chrome</title>
 <meta name="description" content="A free Chrome extension that warns about fake bank pages, fake virus alerts and known dangerous sites. Private, no ads, no accounts.">
+<link rel="icon" href="reactor.svg" type="image/svg+xml">
 <style>
-:root{--bg:#fff;--fg:#111827;--muted:#374151;--card:#f3f4f6;--accent:#0b4f9c;--on:#fff}
-@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--fg:#f8fafc;--muted:#d1d5db;--card:#1e293b;--accent:#8ec5ff;--on:#0b1220}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:20px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-main{max-width:760px;margin:0 auto;padding:32px 16px 64px}h1{font-size:2em;line-height:1.2;margin:.2em 0}h2{margin-top:1.6em}
-.btn{display:inline-block;background:var(--accent);color:var(--on);font-weight:700;padding:14px 24px;border-radius:10px;text-decoration:none;min-height:52px}
-a{color:var(--accent)}a:focus-visible,.btn:focus-visible{outline:4px solid #ffbf00;outline-offset:3px}
-.card{background:var(--card);border-radius:12px;padding:12px 20px;margin:16px 0}li{margin-bottom:.5em}.note{color:var(--muted);font-size:.9em}
+:root{--bg:#050b14;--fg:#e8f6ff;--muted:#b6cde0;--card:rgba(10,30,52,.82);--line:#2a7fa0;--cyan:#4fe3ff;--on:#00131c;--amber:#ffc24d;--red:#ff6b7d;--focus:#ffe066}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;color:var(--fg);font:20px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+ background:radial-gradient(1000px 520px at 50% -140px,rgba(79,227,255,.22),transparent 70%),
+ linear-gradient(rgba(79,227,255,.05) 1px,transparent 1px) 0 0/40px 40px,linear-gradient(90deg,rgba(79,227,255,.05) 1px,transparent 1px) 0 0/40px 40px,var(--bg);background-attachment:fixed}
+main{max-width:900px;margin:0 auto;padding:40px 18px 72px}
+.hero{display:grid;grid-template-columns:200px 1fr;gap:28px;align-items:center;padding-bottom:28px;border-bottom:1px solid var(--line)}
+.hero img{width:200px;height:200px;filter:drop-shadow(0 0 22px rgba(79,227,255,.75))}
+.kicker{font:.7em ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin:0 0 6px}
+h1{font-size:3em;line-height:1.05;margin:0 0 .25em;text-shadow:0 0 24px rgba(79,227,255,.6)}
+.lead{font-size:1.1em;color:var(--fg);margin:0 0 1em}
+.btn{display:inline-block;background:var(--cyan);color:var(--on);font-weight:800;padding:16px 28px;border-radius:8px;text-decoration:none;min-height:56px;box-shadow:0 0 24px rgba(79,227,255,.5);border:2px solid var(--cyan)}
+.btn:hover{box-shadow:0 0 36px rgba(79,227,255,.85)}
+.btn.ghost{background:transparent;color:var(--cyan);box-shadow:none;margin-left:10px}
+a{color:var(--cyan)}a:focus-visible,.btn:focus-visible{outline:4px solid var(--focus);outline-offset:3px}
+h2{font-size:1em;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:2.2em 0 .8em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 20px}
+.card::before,.card::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--cyan)}
+.card::before{top:-2px;left:-2px;border-right:0;border-bottom:0}.card::after{bottom:-2px;right:-2px;border-left:0;border-top:0}
+.card h3{margin:.1em 0 .3em;font-size:1.05em}.card p{margin:0;color:var(--muted);font-size:.92em}
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:0}
+ol.steps li{counter-increment:s;display:flex;gap:16px;align-items:flex-start;margin-bottom:12px;padding:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:4px}
+ol.steps li::before{content:counter(s);flex:none;width:40px;height:40px;border-radius:50%;border:2px solid var(--cyan);display:grid;place-items:center;font-weight:800;color:var(--cyan);box-shadow:0 0 12px rgba(79,227,255,.5)}
+.alert{border-left:8px solid var(--amber);background:rgba(255,194,77,.12);padding:14px 20px;border-radius:4px}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;background:rgba(2,8,16,.9);padding:2px 8px;border-radius:4px;border:1px solid var(--line)}
+footer{margin-top:3em;color:var(--muted);font-size:.85em}
+@media(max-width:640px){.hero{grid-template-columns:1fr;text-align:center;justify-items:center}h1{font-size:2.3em}.btn.ghost{margin:12px 0 0}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
 <main>
-  <h1>ScamShield</h1>
-  <p>A free Chrome extension that warns you about fake bank pages, fake virus alerts and known dangerous websites. No accounts, no ads, no tracking.</p>
-  <p><a class="btn" href="downloads/scamshield-0.1.0.zip" download>Download ScamShield (zip)</a></p>
+  <section class="hero" aria-labelledby="t">
+    <img src="reactor.svg" alt="">
+    <div>
+      <p class="kicker">Free · Private · No ads</p>
+      <h1 id="t">ScamShield</h1>
+      <p class="lead">An online guard for Chrome. It warns you about fake bank pages, fake "your computer is infected" alerts and known dangerous websites, in big, clear words.</p>
+      <a class="btn" href="downloads/scamshield-0.1.0.zip" download>Download ScamShield</a>
+      <a class="btn ghost" href="#install">How to install</a>
+    </div>
+  </section>
 
-  <h2>Install in 5 steps</h2>
-  <ol>
-    <li>Download the zip above and unzip it into a folder you will keep.</li>
-    <li>In Chrome, open <strong>chrome://extensions</strong>.</li>
-    <li>Turn on <strong>Developer mode</strong> (top right).</li>
-    <li>Click <strong>Load unpacked</strong> and choose the unzipped folder.</li>
-    <li>Click the puzzle-piece icon and pin ScamShield.</li>
+  <h2>What it protects you from</h2>
+  <div class="grid">
+    <div class="card"><h3>Copycat websites</h3><p>Addresses that imitate real companies, like <code>paypal.com.verify-account.net</code>.</p></div>
+    <div class="card"><h3>Fake bank logins</h3><p>Pages that say they are your bank and ask for your password.</p></div>
+    <div class="card"><h3>Fake virus alerts</h3><p>"Your computer is infected, call now" pop-ups that want money or remote access.</p></div>
+    <div class="card"><h3>Suspicious messages</h3><p>Paste a text or email to check it. Links are read as text and never opened.</p></div>
+  </div>
+
+  <h2 id="install">Install in 5 steps</h2>
+  <ol class="steps">
+    <li><span>Download the zip above and unzip it into a folder you will keep.</span></li>
+    <li><span>In Chrome, open <code>chrome://extensions</code>.</span></li>
+    <li><span>Turn on <strong>Developer mode</strong> (top right).</span></li>
+    <li><span>Click <strong>Load unpacked</strong> and choose the unzipped folder.</span></li>
+    <li><span>Click the puzzle-piece icon and pin ScamShield.</span></li>
   </ol>
 
-  <h2>What it does</h2>
-  <ul>
-    <li>Warns about addresses that copy real companies, like paypal.com.verify-account.net.</li>
-    <li>Warns about fake bank sign-in pages and fake "your computer is infected, call us" alerts.</li>
-    <li>Lets you paste a suspicious message or link to check it. Links are never opened.</li>
-    <li>Big, clear warnings with <strong>Go Back</strong>, <strong>Why?</strong> and an optional <strong>Continue Anyway</strong>.</li>
-  </ul>
+  <h2>Please remember</h2>
+  <div class="alert"><strong>ScamShield can only warn you.</strong> "No warning signs found" does not mean a site is safe. If something feels wrong, stop and ask someone you trust.</div>
 
-  <div class="card"><strong>Important:</strong> ScamShield can only warn you. "No warning signs found" does not mean a site is safe. If something feels wrong, stop and ask someone you trust.</div>
-
-  <h2>Privacy</h2>
+  <h2>Your privacy</h2>
   <p>Pages are checked on your computer. Nothing you browse is saved or sent anywhere. The optional online danger list only sends short scrambled fragments of addresses, never the addresses themselves.</p>
 
-  <p class="note"><a href="https://github.com/jackdude6677/scamshield-extension">Source code and full documentation on GitHub</a></p>
+  <footer><a href="https://github.com/jackdude6677/scamshield-extension">Source code and full documentation on GitHub</a></footer>
 </main>
 </body>
 </html>

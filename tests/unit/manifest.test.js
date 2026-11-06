@@ -45,8 +45,8 @@ test('no API keys or remote code anywhere in the extension', () => {
   }
 });
 
-test('the only network call is the optional proxy lookup', () => {
+test('network calls are only the public feed download and the optional proxy lookup', () => {
   const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
   const users = walk(ext).filter((f) => f.endsWith('.js') && /\bfetch\(|XMLHttpRequest|sendBeacon|WebSocket/.test(fs.readFileSync(f, 'utf8')));
-  assert.deepEqual(users.map((f) => path.basename(f)), ['threatdb.js']);
+  assert.deepEqual(users.map((f) => path.basename(f)).sort(), ['feed.js', 'threatdb.js']);
 });

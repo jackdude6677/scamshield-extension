@@ -37,6 +37,8 @@
     });
     $('source').textContent = data.src === 'database'
       ? 'This address is listed in a public security database of dangerous sites.'
+      : data.src === 'feed'
+      ? 'This address is on a free public list of phishing sites. The check happened on your computer, and your address was not sent anywhere.'
       : 'ScamShield checked this address on your computer using simple rules. It can make mistakes. Your address was not sent anywhere for this check.';
     if (data.cont) $('continue').hidden = false;
   }

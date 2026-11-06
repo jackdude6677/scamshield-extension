@@ -5,6 +5,8 @@
   const DEFAULTS = {
     dbEnabled: true,          // use the threat database when a proxy is configured
     proxyUrl: '',             // https://… address of your own lookup proxy (no keys in here)
+    feedEnabled: true,        // free public phishing list, checked on this computer
+    feedUrl: '',              // empty = built-in default
     continueMode: 'rules-only', // 'rules-only' | 'always' | 'never'
     textSize: 'large',        // 'normal' | 'large' | 'xlarge'
   };

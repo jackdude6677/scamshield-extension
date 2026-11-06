@@ -13,19 +13,21 @@
 
   const CSS = `
     :host { all: initial; }
-    .wrap { position: fixed; inset: 0; z-index: 2147483647; background: #5c0010; color: #fff; overflow: auto;
+    .wrap { position: fixed; inset: 0; z-index: 2147483647; color: #fff; overflow: auto;
+      background: radial-gradient(900px 480px at 50% -140px, rgba(255,60,90,.40), transparent 70%),
+        repeating-linear-gradient(135deg, rgba(255,107,125,.05) 0 14px, transparent 14px 28px), #1b0208;
       font: 22px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; display: flex; align-items: flex-start; justify-content: center; }
-    .card { max-width: 760px; width: 100%; padding: 32px 24px 48px; box-sizing: border-box; }
-    .brand { font-size: 18px; letter-spacing: .04em; text-transform: uppercase; opacity: .95; margin: 0 0 16px; }
-    h1 { font-size: 36px; line-height: 1.2; margin: 0 0 16px; }
+    .card { max-width: 780px; width: 100%; padding: 32px 24px 48px; box-sizing: border-box; }
+    .brand { font: 15px ui-monospace, Menlo, Consolas, monospace; letter-spacing: .16em; text-transform: uppercase; color: #ffb3bd; margin: 0 0 16px; }
+    h1 { font-size: 36px; line-height: 1.2; margin: 0 0 16px; text-shadow: 0 0 18px rgba(255,80,100,.6); }
     p { margin: 0 0 16px; }
     .actions { display: flex; flex-direction: column; gap: 14px; margin: 28px 0 8px; }
-    button { font: inherit; font-weight: 700; min-height: 60px; padding: 14px 24px; border-radius: 12px; border: 3px solid #fff; cursor: pointer; }
-    button:focus-visible { outline: 5px solid #ffd54a; outline-offset: 3px; }
-    .primary { background: #fff; color: #5c0010; font-size: 26px; }
+    button { font: inherit; font-weight: 700; min-height: 60px; padding: 14px 24px; border-radius: 8px; border: 2px solid #fff; cursor: pointer; }
+    button:focus-visible { outline: 5px solid #ffe066; outline-offset: 3px; }
+    .primary { background: #fff; color: #3a0010; font-size: 26px; min-height: 68px; box-shadow: 0 0 26px rgba(255,255,255,.35); }
     .secondary { background: transparent; color: #fff; }
     .quiet { background: transparent; color: #fff; border-color: transparent; text-decoration: underline; font-weight: 500; min-height: 48px; }
-    .why { background: rgba(0,0,0,.35); border-radius: 12px; padding: 16px 20px; margin-top: 16px; }
+    .why { background: rgba(0,0,0,.45); border: 1px solid #b3314a; padding: 16px 20px; margin-top: 16px; }
     .why ul { margin: 0; padding-left: 24px; } .why li { margin-bottom: 12px; }
     [hidden] { display: none !important; }
     @media (prefers-reduced-motion: no-preference) { .card { animation: in .15s ease-out; } @keyframes in { from { opacity: 0 } to { opacity: 1 } } }
@@ -72,7 +74,7 @@
     if (await allowContinue()) actions.appendChild(cont);
 
     const card = el('div', { class: 'card', role: 'alertdialog', 'aria-modal': 'true', 'aria-labelledby': 'ss-title', 'aria-describedby': 'ss-desc' }, [
-      el('p', { class: 'brand', text: 'ScamShield warning' }), title, summary, actions, why,
+      el('p', { class: 'brand', text: 'ScamShield · threat alert' }), title, summary, actions, why,
     ]);
     root.appendChild(el('div', { class: 'wrap' }, [card]));
 

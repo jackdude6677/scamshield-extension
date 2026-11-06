@@ -9,7 +9,8 @@ No accounts, no ads, no tracking, no paid services.
 
 | Protection | How it works |
 |---|---|
-| **Known dangerous sites** | Checks each page you open against Google Safe Browsing through a small proxy you run. Only 4-byte hash prefixes leave your computer, never URLs. Optional; off until you add a proxy. |
+| **Known phishing sites (free, no setup)** | A GitHub Action rebuilds a hashed copy of the free OpenPhish community feed every 4 hours. The extension downloads that one public file and checks sites **on your computer**. Nothing you visit is sent anywhere. |
+| **Google Safe Browsing (optional)** | Bigger list, but Google requires an API key, which must never be inside an extension. Deploy the included proxy (below); only 4-byte hash prefixes ever leave your computer. |
 | **Look-alike / impersonating addresses** | Conservative rules: `paypal.com.verify-account.net`, `paypa1.com`, `chase-secure-login.com`, `https://chase.com@evil.example`, mixed-alphabet (homograph) names. |
 | **Fake bank / account login pages** | Content script: page claims to be a bank/payment brand, asks for a password, and the domain isn't the brand's. Extra signals (form posts elsewhere, no HTTPS, "verify within 24h", SSN/card fields) raise confidence. |
 | **Fake virus / tech-support alerts** | Content script: a false infection alarm **and** a phone number / "call support" **and** pressure ("do not close"). Security vendors, government and scam-awareness pages are exempt. |
@@ -17,7 +18,14 @@ No accounts, no ads, no tracking, no paid services.
 
 Warnings are large and high-contrast, explain the *specific* risk, and offer **Go Back**, **Why?**, and (optionally) **Continue Anyway**, which needs a second confirming click, and is hidden for database-confirmed threats unless you change it in Settings.
 
-## Install (Chrome, local)
+## Install
+
+Chrome does not allow installing an extension directly from a GitHub link. Your options:
+
+1. **Load unpacked (free, works today)**, see below.
+2. **Chrome Web Store** (one-time $5 developer fee, not required): follow [`docs/PUBLISHING.md`](docs/PUBLISHING.md) to publish the same zip. After approval, anyone can install with one click and gets automatic updates.
+
+### Load unpacked (Chrome, local)
 
 1. Download `downloads/scamshield-0.1.0.zip`, or run `npm run package` (output: `dist/`), or use `extension/` directly.
 2. Unzip it somewhere permanent (or just use the `extension/` folder).
@@ -37,7 +45,17 @@ Chrome will say the extension can "read and change data on websites". That is ne
 
 No `tabs`, `history`, `cookies`, `webRequest`, or host permissions. `tests/unit/manifest.test.js` enforces this.
 
-## Threat database (optional, no keys in the extension)
+## Free public phishing list (default, no keys)
+
+```
+OpenPhish feed ──(GitHub Action, every 4h)──▶ hashed list on the "feed" branch ──▶ extension downloads it, checks locally
+```
+* Workflow: `.github/workflows/update-feed.yml` (runs automatically once the repo is on GitHub; trigger it once from the Actions tab to create the first list).
+* The published file contains only 64-bit SHA-256 fragments, no readable URLs. Whole-site entries for well-known domains are refused.
+* OpenPhish's community feed is free for non-commercial use. Check [their terms](https://openphish.com) before redistributing.
+* Turn it off or refresh it any time in Settings.
+
+## Google Safe Browsing (optional, no keys in the extension)
 
 ```
 Chrome extension ──(8-hex-char SHA-256 prefixes)──▶ your Cloudflare Worker ──(API key)──▶ Safe Browsing
@@ -45,14 +63,15 @@ Chrome extension ──(8-hex-char SHA-256 prefixes)──▶ your Cloudflare Wo
  compares full hashes locally
 ```
 
-See [`proxy/README.md`](proxy/README.md). Deploy the Worker (free tier), add the key as a Worker secret, restrict `ALLOWED_ORIGINS` to your extension ID, then paste the Worker URL in ScamShield → Settings.
+See [`proxy/README.md`](proxy/README.md). The `Deploy Safe Browsing proxy` workflow can deploy it from GitHub if you add the repo secrets `CLOUDFLARE_API_TOKEN` and `SAFE_BROWSING_API_KEY`. Deploy the Worker (free tier), add the key as a Worker secret, restrict `ALLOWED_ORIGINS` to your extension ID, then paste the Worker URL in ScamShield → Settings.
 A failed or missing lookup never blocks browsing; it just means that check didn't happen (the popup says so).
 
 ## Privacy
 
 * No browsing history is stored. No analytics. Settings live in `chrome.storage.local` only.
 * Heuristic checks run entirely on-device.
-* With the database on, only 4-byte hash prefixes are sent, `credentials: omit`, `no-referrer`, to the proxy **you** configure.
+* The free list is one public file download; your browsing is never part of any request.
+* With Safe Browsing on, only 4-byte hash prefixes are sent, `credentials: omit`, `no-referrer`, to the proxy **you** configure.
 * Pasted messages are analysed on-device; links inside them are never fetched.
 
 ## Development

@@ -1,0 +1,15 @@
+name: Deploy Safe Browsing proxy (optional)
+# Needs repo secrets: CLOUDFLARE_API_TOKEN, SAFE_BROWSING_API_KEY. Edit proxy/wrangler.toml ALLOWED_ORIGINS first.
+on: workflow_dispatch
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: proxy
+          secrets: SAFE_BROWSING_API_KEY
+        env:
+          SAFE_BROWSING_API_KEY: ${{ secrets.SAFE_BROWSING_API_KEY }}

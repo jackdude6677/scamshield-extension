@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ScamShield settings</title>
   <link rel="stylesheet" href="src/ui.css">
-  <style>main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; } fieldset { border: 2px solid var(--border); border-radius: 10px; margin: 16px 0; padding: 12px 16px; } legend { font-weight: 700; padding: 0 6px; } .opt { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; } .opt input { width: 24px; height: 24px; margin-top: 4px; flex: none; } .opt label { font-weight: 500; margin: 0; }</style>
+  <style>main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; } fieldset { border: 1px solid var(--line); border-radius: 4px; background: var(--card); margin: 16px 0; padding: 12px 16px; } legend { font-weight: 700; padding: 0 8px; color: var(--cyan); text-transform: uppercase; letter-spacing: .06em; } .opt { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; } .opt input { width: 24px; height: 24px; margin-top: 4px; flex: none; accent-color: #4fe3ff; } .opt label { font-weight: 500; margin: 0; }</style>
 </head>
 <body>
 <main>
-  <h1>ScamShield settings</h1>
+  <header class="hud-top"><img src="icons/reactor.svg" alt="" width="52" height="52"><h1>ScamShield settings <span class="tag">Control panel</span></h1></header>
   <p>Everything here is saved only on this computer.</p>
 
   <fieldset>
@@ -27,7 +27,15 @@
   </fieldset>
 
   <fieldset>
-    <legend>Online danger list (optional)</legend>
+    <legend>Free public danger list (recommended)</legend>
+    <p>ScamShield downloads a free public list of known phishing sites a few times a day and checks sites against it on your computer. The sites you visit are never sent anywhere. The list comes from the OpenPhish community feed.</p>
+    <div class="opt"><input type="checkbox" id="feed-enabled"><label for="feed-enabled">Use the free public danger list</label></div>
+    <p id="feed-status" class="fineprint" role="status" aria-live="polite">Checking…</p>
+    <button id="feed-refresh" type="button" class="secondary">Update the list now</button>
+  </fieldset>
+
+  <fieldset>
+    <legend>Google Safe Browsing (optional, advanced)</legend>
     <p>ScamShield can also ask a public security database whether a site is known to be dangerous. To protect your privacy, only a short scrambled fragment of each address is sent, never the address itself.
       This needs a small lookup service that holds the API key, so the key is never stored in the extension. See the README for how to set one up.</p>
     <div class="opt"><input type="checkbox" id="db-enabled"><label for="db-enabled">Use the online danger list</label></div>
