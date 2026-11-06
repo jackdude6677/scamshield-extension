@@ -27,7 +27,15 @@
   </fieldset>
 
   <fieldset>
-    <legend>Online danger list (optional)</legend>
+    <legend>Free public danger list (recommended)</legend>
+    <p>ScamShield downloads a free public list of known phishing sites a few times a day and checks sites against it on your computer. The sites you visit are never sent anywhere. The list comes from the OpenPhish community feed.</p>
+    <div class="opt"><input type="checkbox" id="feed-enabled"><label for="feed-enabled">Use the free public danger list</label></div>
+    <p id="feed-status" class="fineprint" role="status" aria-live="polite">Checking…</p>
+    <button id="feed-refresh" type="button" class="secondary">Update the list now</button>
+  </fieldset>
+
+  <fieldset>
+    <legend>Google Safe Browsing (optional, advanced)</legend>
     <p>ScamShield can also ask a public security database whether a site is known to be dangerous. To protect your privacy, only a short scrambled fragment of each address is sent, never the address itself.
       This needs a small lookup service that holds the API key, so the key is never stored in the extension. See the README for how to set one up.</p>
     <div class="opt"><input type="checkbox" id="db-enabled"><label for="db-enabled">Use the online danger list</label></div>

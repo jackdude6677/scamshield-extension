@@ -88,9 +88,12 @@
 
   async function showDbStatus() {
     const s = await SS.settings.get();
-    $('db-status').textContent = s.dbEnabled && s.proxyUrl
-      ? 'Online danger list: connected'
-      : 'Online danger list: not connected (checks run on this computer only)';
+    const st = await chrome.runtime.sendMessage({ type: 'FEED_STATUS' }).catch(() => null);
+    const parts = [];
+    if (s.feedEnabled) parts.push(st && st.loaded ? `Danger list: ${st.count.toLocaleString()} sites, updated ${new Date(st.at).toLocaleDateString()}` : 'Danger list: not downloaded yet');
+    else parts.push('Danger list: off');
+    if (s.dbEnabled && s.proxyUrl) parts.push('Google Safe Browsing: connected');
+    $('db-status').textContent = parts.join(' · ');
   }
 
   async function init() {

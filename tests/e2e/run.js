@@ -7,6 +7,7 @@ const fs = require('fs');
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
 const T = require('../../extension/src/threatdb.js');
+const { build: buildFeed } = require('../../scripts/build-feed.js');
 
 const EXT = path.join(__dirname, '..', '..', 'extension');
 const results = [];
@@ -33,6 +34,7 @@ const PAGES = {
   'alert-center.test': `<title>Windows Security Alert</title><h1>Your computer is infected!</h1>
     <p>Microsoft Windows Security Alert. 5 viruses detected. Do not close this window or restart your computer.
     Call Microsoft Support now: 1-888-555-0142 (toll free). Your personal information is at risk.</p>`,
+  'feedbad.test': '<title>Account check</title><h1>Totally fine page</h1>',
   'badsite.test': '<title>Free prizes</title><h1>Totally fine page</h1>',
   'paypal.com.verify-account.test': '<title>Hello</title><h1>You reached the impostor page</h1>',
   'paypal.com.secure-check.test': '<title>Hello</title><h1>Second impostor</h1>',
@@ -67,6 +69,17 @@ const PAGES = {
   });
   await new Promise((r) => proxy.listen(0, '127.0.0.1', r));
   const proxyPort = proxy.address().port;
+
+  // Mock public phishing feed listing feedbad.test/phish
+  const feedBody = JSON.stringify(await buildFeed(['http://feedbad.test/phish', ...Array.from({ length: 60 }, (_, i) => `http://filler${i}.test/x`)], 'e2e'));
+  const feedHits = [];
+  const feedServer = http.createServer((req, res) => {
+    feedHits.push(req.url);
+    res.writeHead(200, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+    res.end(feedBody);
+  });
+  await new Promise((r) => feedServer.listen(0, '127.0.0.1', r));
+  const feedPort = feedServer.address().port;
 
   const userDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ss-e2e-'));
   const ctx = await chromium.launchPersistentContext(userDir, {
@@ -213,6 +226,34 @@ const PAGES = {
     await p.close();
   });
 
+  // ---- free public phishing feed (mock) ----
+  await sw.evaluate((u) => SS.settings.set({ feedUrl: u, feedEnabled: true }), `http://127.0.0.1:${feedPort}/phishing.json`);
+  await step('settings page: "Update the list now" downloads the feed and shows how many sites it knows', async () => {
+    await opts.reload();
+    assert.equal(await opts.isChecked('#feed-enabled'), true);
+    await opts.click('#feed-refresh');
+    await opts.waitForFunction(() => /61 known phishing addresses/.test(document.getElementById('feed-status').textContent));
+  });
+  await step('page on the public phishing list is blocked (no Continue button); other pages on that host are not', async () => {
+    const p = await newPage();
+    await p.goto(U('feedbad.test', '/phish')).catch(() => {});
+    await waitWarning(p);
+    assert.match(await p.textContent('#title'), /dangerous/i);
+    assert.match(await p.textContent('#summary'), /public list of known phishing/);
+    assert.match(await p.textContent('#source'), /free public list/);
+    assert.equal(await p.isVisible('#continue'), false);
+    await p.close();
+    const q = await newPage();
+    await q.goto(U('feedbad.test', '/different-page'));
+    await q.waitForTimeout(1200);
+    assert.match(await q.textContent('h1'), /Totally fine/);
+    await q.close();
+  });
+  await step('feed server only ever saw plain downloads of the one public file (no visited URLs)', async () => {
+    assert.ok(feedHits.length >= 1);
+    assert.ok(feedHits.every((u) => u === '/phishing.json'), JSON.stringify(feedHits));
+  });
+
   // ---- pasted message analyzer ----
   const pop = await ctx.newPage();
   await pop.goto(`chrome-extension://${extId}/popup.html`);
@@ -249,7 +290,7 @@ const PAGES = {
   });
 
   await ctx.close();
-  server.close(); proxy.close();
+  server.close(); proxy.close(); feedServer.close();
   const failed = results.filter((r) => !r[0]).length;
   console.log(`\n${results.length - failed}/${results.length} e2e checks passed`);
   process.exit(failed ? 1 : 0);
