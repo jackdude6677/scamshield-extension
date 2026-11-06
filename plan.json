@@ -1,0 +1,74 @@
+{
+  "package": "scamshield",
+  "milestones": [
+    {
+      "name": "Scaffold project and basic test",
+      "goal": "Create the Python package scaffold with a CLI entry, requirements, and a passing unit test. This establishes the development environment and ensures the test runner works.",
+      "check": "python -m pytest -q tests/test_scaffold.py",
+      "sections": [],
+      "owns": ["scamshield/__init__.py", "scamshield/cli.py", "requirements.txt", "tests/test_scaffold.py"],
+      "needs": [],
+      "parallel": false
+    },
+    {
+      "name": "Backend proxy for threat lookups",
+      "goal": "Implement a minimal Flask proxy that receives a URL hash prefix, queries a threat database (e.g., Google Safe Browsing) using a server‑side API key, and returns a JSON verdict. The API key is never exposed to the extension.",
+      "check": "curl -s http://127.0.0.1:5000/health | grep OK",
+      "sections": [],
+      "owns": ["backend/app.py", "tests/test_backend.py"],
+      "needs": [1],
+      "parallel": false,
+      "effort": "low"
+    },
+    {
+      "name": "Extension manifest and background script",
+      "goal": "Create Manifest V3 JSON, a background service worker that forwards URL checks to the proxy, and a messaging bridge to content scripts. Permissions are limited to activeTab and storage.",
+      "check": "jq '.manifest_version' extension/manifest.json",
+      "sections": [],
+      "owns": ["extension/manifest.json", "extension/background.js"],
+      "needs": [1,2],
+      "parallel": false,
+      "effort": "low"
+    },
+    {
+      "name": "Content script and warning UI",
+      "goal": "Add a content script that receives verdicts, injects an accessible warning overlay with large text, high contrast, and buttons: Go Back, Why?, Continue Anyway.",
+      "check": "node -e \"require('./extension/content.js')\"",
+      "sections": [],
+      "owns": ["extension/content.js", "extension/warning.html", "extension/ui.css"],
+      "needs": [3],
+      "parallel": false,
+      "effort": "low"
+    },
+    {
+      "name": "Domain impersonation detection rules",
+      "goal": "Implement a Python module that flags look‑alike, typosquat, and homograph domains using public‑suffix list and Levenshtein distance. Export a function used by the backend before calling the external threat API.",
+      "check": "python -c \"import scamshield.detection as d; assert d.is_suspicious('g00gle.com')\"",
+      "sections": [],
+      "owns": ["scamshield/detection.py", "tests/test_detection.py"],
+      "needs": [2],
+      "parallel": false,
+      "effort": "low"
+    },
+    {
+      "name": "Popup analyzer for pasted messages",
+      "goal": "Create a popup UI (HTML/JS) that lets users paste a message or link, sends it to the backend for analysis, and displays the risk without navigating. Include keyboard navigation for accessibility.",
+      "check": "grep -q 'Analyze' extension/popup.html",
+      "sections": [],
+      "owns": ["extension/popup.html", "extension/popup.js", "tests/test_popup.py"],
+      "needs": [2,5],
+      "parallel": false,
+      "effort": "low"
+    },
+    {
+      "name": "Accessibility polish, packaging and integration tests",
+      "goal": "Finalize high‑contrast styles, ARIA labels, and screen‑reader friendly markup. Add a build script that zips the extension folder, a README with install instructions, and an integration test that simulates a flagged URL flow.",
+      "check": "python -m pytest -q tests/test_integration.py",
+      "sections": [],
+      "owns": ["README.md", "build_package.py", "tests/test_integration.py"],
+      "needs": [1,2,3,4,5,6],
+      "parallel": false,
+      "effort": "low"
+    }
+  ]
+}
