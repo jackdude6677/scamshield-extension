@@ -1,0 +1,15 @@
+{
+  "name": "scamshield-extension",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ScamShield: a free Chrome (Manifest V3) extension that helps protect people from online scams.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test tests/unit/*.test.js",
+    "test:e2e": "node tests/e2e/run.js",
+    "icons": "node scripts/make-icons.js",
+    "package": "node scripts/package.js",
+    "check": "npm test && npm run test:e2e"
+  },
+  "devDependencies": {}
+}

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" class="size-large">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScamShield</title>
+  <link rel="stylesheet" href="src/ui.css">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="top">
+    <img src="icons/icon48.png" alt="" width="36" height="36">
+    <h1>ScamShield</h1>
+  </header>
+
+  <main>
+    <section aria-labelledby="h-page">
+      <h2 id="h-page">This page</h2>
+      <div id="page-status" class="card status none" role="status" aria-live="polite">
+        <p>Checking…</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-msg">
+      <h2 id="h-msg">Got a suspicious message?</h2>
+      <label for="msg">Paste the message or link here</label>
+      <textarea id="msg" rows="5" placeholder="Paste a text, email or link. Nothing will be opened." autocomplete="off" spellcheck="false"></textarea>
+      <p class="fineprint">Links are only read as text. They are never opened.</p>
+      <div class="row">
+        <button id="analyze" type="button">Check this message</button>
+        <button id="clear" type="button" class="secondary">Clear</button>
+      </div>
+      <div id="msg-result" role="status" aria-live="polite" tabindex="-1"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p class="fineprint" id="db-status"></p>
+    <button id="settings" type="button" class="secondary small">Settings</button>
+  </footer>
+  <script src="src/domain.js"></script>
+  <script src="src/settings.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

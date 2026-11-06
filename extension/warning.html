@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" class="size-large">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>ScamShield warning</title>
+  <link rel="stylesheet" href="src/ui.css">
+  <link rel="stylesheet" href="warning.css">
+</head>
+<body>
+  <main class="wrap" id="main" role="alertdialog" aria-modal="true" aria-labelledby="title" aria-describedby="summary">
+    <p class="brand"><img src="icons/icon48.png" alt="" width="32" height="32"> ScamShield warning</p>
+    <h1 id="title" tabindex="-1">Loading…</h1>
+    <p id="summary" class="summary"></p>
+    <p class="site">Website: <strong id="host"></strong></p>
+
+    <div class="actions">
+      <button id="back" class="primary" type="button">Go Back to safety</button>
+      <button id="why" class="secondary" type="button" aria-expanded="false" aria-controls="why-panel">Why?</button>
+      <button id="continue" class="quiet" type="button" hidden>Continue Anyway</button>
+    </div>
+
+    <section id="why-panel" class="why" hidden aria-label="Why you are seeing this warning">
+      <h2>Why am I seeing this?</h2>
+      <ul id="reasons" class="reasons"></ul>
+      <h2>What should I do?</h2>
+      <ul class="reasons">
+        <li>Do not type passwords, card numbers or Social Security numbers on this site.</li>
+        <li>Do not call phone numbers shown on it or install anything it offers.</li>
+        <li>If you want to reach a company, type its address yourself or use the number on your card or bill.</li>
+        <li>If you already gave away details, call your bank and change your passwords.</li>
+      </ul>
+      <p class="fineprint" id="source"></p>
+      <p class="fineprint">Full address: <span id="fulladdr" class="break"></span></p>
+    </section>
+  </main>
+  <script src="warning.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+body { background: #5c0010; color: #ffffff; min-height: 100vh; }
+.wrap { max-width: 800px; margin: 0 auto; padding: 32px 24px 64px; }
+.brand { display: flex; align-items: center; gap: 10px; font-size: .85em; letter-spacing: .05em; text-transform: uppercase; margin: 0 0 18px; }
+h1 { font-size: 2em; } h1:focus { outline: none; }
+.summary { font-size: 1.1em; }
+.site { word-break: break-all; }
+.actions { display: flex; flex-direction: column; gap: 14px; margin: 28px 0 12px; }
+.actions button { border-color: #fff; }
+.primary { background: #fff; color: #5c0010; font-size: 1.3em; min-height: 64px; }
+.secondary { background: transparent; color: #fff; border-color: #fff; }
+.quiet { background: transparent; color: #fff; border-color: transparent; text-decoration: underline; font-weight: 500; }
+.quiet.armed { border-color: #fff; text-decoration: none; font-weight: 700; }
+.why { background: rgba(0,0,0,.35); border-radius: 12px; padding: 8px 20px 16px; margin-top: 20px; }
+.why a { color: #ffe08a; } .fineprint { color: #f5d5da; }
+.break { word-break: break-all; }
+[hidden] { display: none !important; }
+button:focus-visible { outline-color: #ffd54a; }
