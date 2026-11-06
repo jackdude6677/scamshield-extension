@@ -19,7 +19,7 @@ Warnings are large and high-contrast, explain the *specific* risk, and offer **G
 
 ## Install (Chrome, local)
 
-1. `npm run package` (or use `extension/` directly). This produces `dist/scamshield-0.1.0.zip`.
+1. Download `downloads/scamshield-0.1.0.zip`, or run `npm run package` (output: `dist/`), or use `extension/` directly.
 2. Unzip it somewhere permanent (or just use the `extension/` folder).
 3. Open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, choose the folder.
 4. Pin ScamShield from the puzzle-piece menu so the shield is always visible.

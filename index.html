@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ScamShield: free scam protection for Chrome</title>
+<meta name="description" content="A free Chrome extension that warns about fake bank pages, fake virus alerts and known dangerous sites. Private, no ads, no accounts.">
+<style>
+:root{--bg:#fff;--fg:#111827;--muted:#374151;--card:#f3f4f6;--accent:#0b4f9c;--on:#fff}
+@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--fg:#f8fafc;--muted:#d1d5db;--card:#1e293b;--accent:#8ec5ff;--on:#0b1220}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:20px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:760px;margin:0 auto;padding:32px 16px 64px}h1{font-size:2em;line-height:1.2;margin:.2em 0}h2{margin-top:1.6em}
+.btn{display:inline-block;background:var(--accent);color:var(--on);font-weight:700;padding:14px 24px;border-radius:10px;text-decoration:none;min-height:52px}
+a{color:var(--accent)}a:focus-visible,.btn:focus-visible{outline:4px solid #ffbf00;outline-offset:3px}
+.card{background:var(--card);border-radius:12px;padding:12px 20px;margin:16px 0}li{margin-bottom:.5em}.note{color:var(--muted);font-size:.9em}
+</style>
+</head>
+<body>
+<main>
+  <h1>ScamShield</h1>
+  <p>A free Chrome extension that warns you about fake bank pages, fake virus alerts and known dangerous websites. No accounts, no ads, no tracking.</p>
+  <p><a class="btn" href="downloads/scamshield-0.1.0.zip" download>Download ScamShield (zip)</a></p>
+
+  <h2>Install in 5 steps</h2>
+  <ol>
+    <li>Download the zip above and unzip it into a folder you will keep.</li>
+    <li>In Chrome, open <strong>chrome://extensions</strong>.</li>
+    <li>Turn on <strong>Developer mode</strong> (top right).</li>
+    <li>Click <strong>Load unpacked</strong> and choose the unzipped folder.</li>
+    <li>Click the puzzle-piece icon and pin ScamShield.</li>
+  </ol>
+
+  <h2>What it does</h2>
+  <ul>
+    <li>Warns about addresses that copy real companies, like paypal.com.verify-account.net.</li>
+    <li>Warns about fake bank sign-in pages and fake "your computer is infected, call us" alerts.</li>
+    <li>Lets you paste a suspicious message or link to check it. Links are never opened.</li>
+    <li>Big, clear warnings with <strong>Go Back</strong>, <strong>Why?</strong> and an optional <strong>Continue Anyway</strong>.</li>
+  </ul>
+
+  <div class="card"><strong>Important:</strong> ScamShield can only warn you. "No warning signs found" does not mean a site is safe. If something feels wrong, stop and ask someone you trust.</div>
+
+  <h2>Privacy</h2>
+  <p>Pages are checked on your computer. Nothing you browse is saved or sent anywhere. The optional online danger list only sends short scrambled fragments of addresses, never the addresses themselves.</p>
+
+  <p class="note"><a href="https://github.com/jackdude6677/scamshield-extension">Source code and full documentation on GitHub</a></p>
+</main>
+</body>
+</html>
