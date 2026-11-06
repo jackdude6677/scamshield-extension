@@ -1,8 +1,6 @@
-.venv/
-.home/
-__pycache__/
-*.pyc
-.pytest_cache/
 node_modules/
-data/raw/
+dist/
+.venv/
 *.log
+.DS_Store
+.wrangler/

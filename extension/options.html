@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" class="size-large">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScamShield settings</title>
+  <link rel="stylesheet" href="src/ui.css">
+  <style>main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; } fieldset { border: 2px solid var(--border); border-radius: 10px; margin: 16px 0; padding: 12px 16px; } legend { font-weight: 700; padding: 0 6px; } .opt { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; } .opt input { width: 24px; height: 24px; margin-top: 4px; flex: none; } .opt label { font-weight: 500; margin: 0; }</style>
+</head>
+<body>
+<main>
+  <h1>ScamShield settings</h1>
+  <p>Everything here is saved only on this computer.</p>
+
+  <fieldset>
+    <legend>Text size</legend>
+    <div class="opt"><input type="radio" name="size" id="size-normal" value="normal"><label for="size-normal">Normal</label></div>
+    <div class="opt"><input type="radio" name="size" id="size-large" value="large"><label for="size-large">Large</label></div>
+    <div class="opt"><input type="radio" name="size" id="size-xlarge" value="xlarge"><label for="size-xlarge">Extra large</label></div>
+  </fieldset>
+
+  <fieldset>
+    <legend>"Continue Anyway" button on warnings</legend>
+    <div class="opt"><input type="radio" name="cont" id="cont-rules" value="rules-only"><label for="cont-rules">Show it, except for sites listed in the online danger list (recommended)</label></div>
+    <div class="opt"><input type="radio" name="cont" id="cont-always" value="always"><label for="cont-always">Always show it</label></div>
+    <div class="opt"><input type="radio" name="cont" id="cont-never" value="never"><label for="cont-never">Never show it. Only "Go Back".</label></div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Online danger list (optional)</legend>
+    <p>ScamShield can also ask a public security database whether a site is known to be dangerous. To protect your privacy, only a short scrambled fragment of each address is sent, never the address itself.
+      This needs a small lookup service that holds the API key, so the key is never stored in the extension. See the README for how to set one up.</p>
+    <div class="opt"><input type="checkbox" id="db-enabled"><label for="db-enabled">Use the online danger list</label></div>
+    <label for="proxy">Lookup service address</label>
+    <input type="url" id="proxy" placeholder="https://scamshield-lookup.example.workers.dev" inputmode="url" autocomplete="off" aria-describedby="proxy-help">
+    <p class="fineprint" id="proxy-help">Must start with https://. Leave empty to turn this off.</p>
+  </fieldset>
+
+  <button id="save" type="button">Save settings</button>
+  <p id="saved" role="status" aria-live="polite"></p>
+
+  <h2>Your privacy</h2>
+  <ul class="reasons">
+    <li>ScamShield has no accounts, no tracking and no ads. It never saves the sites you visit.</li>
+    <li>Pages are checked on your computer. Page text is never sent anywhere.</li>
+    <li>If you turn on the online danger list, only 8-character fragments of scrambled address codes are sent to your lookup service.</li>
+    <li>ScamShield cannot tell you a site is safe. It can only warn you when it sees signs of a scam.</li>
+  </ul>
+</main>
+<script src="src/settings.js"></script>
+<script src="options.js"></script>
+</body>
+</html>

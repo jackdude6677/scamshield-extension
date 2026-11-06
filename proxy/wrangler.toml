@@ -1,0 +1,10 @@
+name = "scamshield-lookup"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+[vars]
+# Replace with your extension's ID (chrome://extensions → ScamShield → ID).
+ALLOWED_ORIGINS = "chrome-extension://REPLACE_WITH_EXTENSION_ID"
+
+# Add the key as a secret – never commit it:
+#   npx wrangler secret put SAFE_BROWSING_API_KEY

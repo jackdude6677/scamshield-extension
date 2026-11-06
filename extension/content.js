@@ -1,102 +1,133 @@
-// Content script for ScamShield extension
-// Listens for verdict messages and injects a warning overlay.
+/* ScamShield – content script. Reads the page locally; nothing here leaves your computer.
+ * Shows a full-page warning only for high-confidence fake bank logins / fake virus alerts. */
+(function () {
+  'use strict';
+  if (window.top !== window) return;
+  const SS = self.SS;
+  const P = SS.pagecheck;
+  const DISMISS_KEY = 'scamshield-dismissed-' + location.hostname;
 
-// Export an init function for testing / manual invocation.
-function init() {
-  if (typeof chrome === 'undefined' || !chrome.runtime) {
-    // Not in Chrome extension context; expose for Node require.
-    return;
+  let last = { level: 'none', reasons: [], score: 0 };
+  let overlayShown = false;
+  let runs = 0;
+
+  const CSS = `
+    :host { all: initial; }
+    .wrap { position: fixed; inset: 0; z-index: 2147483647; background: #5c0010; color: #fff; overflow: auto;
+      font: 22px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; display: flex; align-items: flex-start; justify-content: center; }
+    .card { max-width: 760px; width: 100%; padding: 32px 24px 48px; box-sizing: border-box; }
+    .brand { font-size: 18px; letter-spacing: .04em; text-transform: uppercase; opacity: .95; margin: 0 0 16px; }
+    h1 { font-size: 36px; line-height: 1.2; margin: 0 0 16px; }
+    p { margin: 0 0 16px; }
+    .actions { display: flex; flex-direction: column; gap: 14px; margin: 28px 0 8px; }
+    button { font: inherit; font-weight: 700; min-height: 60px; padding: 14px 24px; border-radius: 12px; border: 3px solid #fff; cursor: pointer; }
+    button:focus-visible { outline: 5px solid #ffd54a; outline-offset: 3px; }
+    .primary { background: #fff; color: #5c0010; font-size: 26px; }
+    .secondary { background: transparent; color: #fff; }
+    .quiet { background: transparent; color: #fff; border-color: transparent; text-decoration: underline; font-weight: 500; min-height: 48px; }
+    .why { background: rgba(0,0,0,.35); border-radius: 12px; padding: 16px 20px; margin-top: 16px; }
+    .why ul { margin: 0; padding-left: 24px; } .why li { margin-bottom: 12px; }
+    [hidden] { display: none !important; }
+    @media (prefers-reduced-motion: no-preference) { .card { animation: in .15s ease-out; } @keyframes in { from { opacity: 0 } to { opacity: 1 } } }
+  `;
+
+  function el(tag, props, children) {
+    const n = document.createElement(tag);
+    Object.entries(props || {}).forEach(([k, v]) => { if (k === 'text') n.textContent = v; else n.setAttribute(k, v); });
+    (children || []).forEach((c) => n.appendChild(c));
+    return n;
   }
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message && message.type === 'verdict') {
-      showWarning(message);
+
+  async function allowContinue() {
+    try {
+      const { settings } = await chrome.storage.local.get('settings');
+      const mode = (settings && settings.continueMode) || 'rules-only';
+      return mode !== 'never';
+    } catch (e) { return true; }
+  }
+
+  async function showOverlay(result) {
+    if (overlayShown) return;
+    overlayShown = true;
+    const host = el('div', { id: 'scamshield-warning-host' });
+    const root = host.attachShadow({ mode: 'closed' });
+    try {
+      const sheet = new CSSStyleSheet();
+      sheet.replaceSync(CSS);
+      root.adoptedStyleSheets = [sheet];
+    } catch (e) { root.appendChild(el('style', { text: CSS })); }
+
+    const top = result.reasons[0];
+    const title = el('h1', { id: 'ss-title', text: top.title });
+    const summary = el('p', { id: 'ss-desc', text: top.detail });
+    const why = el('div', { class: 'why', id: 'ss-why', hidden: '' }, [
+      el('p', { text: 'Why am I seeing this?' }),
+      el('ul', {}, result.reasons.slice(0, 4).map((r) => el('li', { text: r.detail }))),
+      el('p', { text: 'ScamShield checked this page on your computer. Nothing you see or type was sent anywhere. It can make mistakes. If you are not sure, go back and ask someone you trust.' }),
+    ]);
+    const back = el('button', { class: 'primary', type: 'button', text: 'Go Back to safety' });
+    const whyBtn = el('button', { class: 'secondary', type: 'button', 'aria-expanded': 'false', 'aria-controls': 'ss-why', text: 'Why?' });
+    const cont = el('button', { class: 'quiet', type: 'button', text: 'Continue Anyway' });
+    const actions = el('div', { class: 'actions' }, [back, whyBtn]);
+    if (await allowContinue()) actions.appendChild(cont);
+
+    const card = el('div', { class: 'card', role: 'alertdialog', 'aria-modal': 'true', 'aria-labelledby': 'ss-title', 'aria-describedby': 'ss-desc' }, [
+      el('p', { class: 'brand', text: 'ScamShield warning' }), title, summary, actions, why,
+    ]);
+    root.appendChild(el('div', { class: 'wrap' }, [card]));
+
+    back.addEventListener('click', () => chrome.runtime.sendMessage({ type: 'GO_BACK' }).catch(() => { location.href = 'about:blank'; }));
+    whyBtn.addEventListener('click', () => {
+      const open = why.hasAttribute('hidden');
+      if (open) why.removeAttribute('hidden'); else why.setAttribute('hidden', '');
+      whyBtn.setAttribute('aria-expanded', String(open));
+    });
+    let armed = false;
+    cont.addEventListener('click', () => {
+      if (!armed) {
+        armed = true;
+        cont.textContent = 'Yes, I understand the risk. Continue.';
+        return;
+      }
+      try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch (e) { /* ignore */ }
+      host.remove();
+      document.documentElement.style.removeProperty('overflow');
+    });
+
+    document.documentElement.appendChild(host);
+    document.documentElement.style.setProperty('overflow', 'hidden', 'important');
+    back.focus();
+  }
+
+  function analyze() {
+    runs += 1;
+    let result;
+    try { result = P.analyzePage(P.extractFeatures(document, window)); } catch (e) { return; }
+    last = result;
+    try { chrome.runtime.sendMessage({ type: 'PAGE_RESULT', level: result.level }).catch(() => {}); } catch (e) { /* extension reloaded */ }
+    let dismissed = false;
+    try { dismissed = sessionStorage.getItem(DISMISS_KEY) === '1'; } catch (e) { /* ignore */ }
+    if (result.level === 'warning' && !dismissed) showOverlay(result);
+  }
+
+  // Answer the popup.
+  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    if (msg && msg.type === 'GET_PAGE_RESULT') {
+      analyze();
+      sendResponse({ level: last.level, score: last.score, reasons: last.reasons.map((r) => ({ code: r.code, title: r.title, detail: r.detail })) });
     }
-    // No async response needed.
-    return false;
   });
-}
 
-function showWarning({ verdict, details }) {
-  // Remove existing overlay if any.
-  const existing = document.getElementById('scamshield-warning');
-  if (existing) existing.remove();
-
-  const overlay = document.createElement('div');
-  overlay.id = 'scamshield-warning';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-modal', 'true');
-  overlay.style.position = 'fixed';
-  overlay.style.top = '0';
-  overlay.style.left = '0';
-  overlay.style.width = '100%';
-  overlay.style.height = '100%';
-  overlay.style.backgroundColor = 'rgba(0,0,0,0.85)';
-  overlay.style.color = '#fff';
-  overlay.style.display = 'flex';
-  overlay.style.flexDirection = 'column';
-  overlay.style.justifyContent = 'center';
-  overlay.style.alignItems = 'center';
-  overlay.style.zIndex = '2147483647';
-  overlay.style.fontSize = '1.5rem';
-  overlay.style.textAlign = 'center';
-  overlay.style.padding = '1rem';
-
-  const title = document.createElement('h1');
-  title.textContent = 'Warning: Potential Scam Detected';
-  title.style.fontSize = '2rem';
-  title.style.marginBottom = '0.5rem';
-  overlay.appendChild(title);
-
-  const msg = document.createElement('p');
-  msg.textContent = `Verdict: ${verdict}`;
-  overlay.appendChild(msg);
-
-  if (details) {
-    const det = document.createElement('p');
-    det.textContent = details;
-    overlay.appendChild(det);
-  }
-
-  const btnContainer = document.createElement('div');
-  btnContainer.style.marginTop = '1rem';
-  btnContainer.style.display = 'flex';
-  btnContainer.style.gap = '1rem';
-
-  const backBtn = document.createElement('button');
-  backBtn.textContent = 'Go Back';
-  backBtn.style.padding = '0.5rem 1rem';
-  backBtn.style.fontSize = '1rem';
-  backBtn.onclick = () => {
-    window.history.back();
-  };
-
-  const whyBtn = document.createElement('button');
-  whyBtn.textContent = 'Why?';
-  whyBtn.style.padding = '0.5rem 1rem';
-  whyBtn.style.fontSize = '1rem';
-  whyBtn.onclick = () => {
-    alert(details || 'No additional information.');
-  };
-
-  const continueBtn = document.createElement('button');
-  continueBtn.textContent = 'Continue Anyway';
-  continueBtn.style.padding = '0.5rem 1rem';
-  continueBtn.style.fontSize = '1rem';
-  continueBtn.onclick = () => {
-    overlay.remove();
-  };
-
-  btnContainer.appendChild(backBtn);
-  btnContainer.appendChild(whyBtn);
-  btnContainer.appendChild(continueBtn);
-  overlay.appendChild(btnContainer);
-
-  document.body.appendChild(overlay);
-}
-
-// Auto‑init when script runs in extension context.
-if (typeof chrome !== 'undefined' && chrome.runtime) {
-  init();
-}
-
-module.exports = { init, showWarning };
+  analyze();
+  // Pages often build their content a moment after load; look again a couple of times.
+  setTimeout(analyze, 1500);
+  setTimeout(analyze, 5000);
+  let timer = null;
+  try {
+    new MutationObserver(() => {
+      if (runs >= 12 || overlayShown) return;
+      clearTimeout(timer);
+      timer = setTimeout(analyze, 1000);
+    }).observe(document.documentElement, { childList: true, subtree: true });
+  } catch (e) { /* ignore */ }
+})();

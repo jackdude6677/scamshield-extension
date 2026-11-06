@@ -1,3 +1,0 @@
-#!/bin/sh
-# Stub curl for health check
-printf "OK"
