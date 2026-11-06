@@ -5,3 +5,4 @@
 - Updated entry point in setup.py to expose `curl` command.
 - All tests pass (`python -m pytest -q`).
 - Health check endpoint verified via stub curl (outputs OK).
+- Added integration tests (tests/test_integration.py) covering manifest version, content script loading, and popup button presence. All tests now pass via `python -m pytest -q`.
